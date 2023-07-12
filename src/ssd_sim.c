@@ -1,9 +1,9 @@
-#include "linked_list.h"
+#include "../header/linked_list.h"
 #define SRAM_WRITE_DELAY 4096
 #define DRAM_WRITE_DELAY 4416
 #define NAND_WRITE_DELAY 1402750
 
-//전역변수
+//global variables
 int global_time = 0;
 
 int sram_wport_busy = 0;
@@ -13,16 +13,15 @@ int nand_busy = 0;
 int pcieq_empty = 0;
 int sram_empty = 1;
 
-int nand_enable = 0; //0 : dram에 write, 1 : nand에 write
+int nand_enable = 0; //0 : write into dram, 1 : write into nand flash
 
-//함수 정의
-
+//functions
 void update_global_time(ListNode* sramq, ListNode* dramq, ListNode* nandq) {
-	//nand write 이전
+	//before the nand write
 	if (!nand_enable) {
 		if (sramq->link != NULL && dramq->link != NULL) {
 			global_time = (sramq->link->end_time < dramq->link->end_time) ? sramq->link->end_time : dramq->link->end_time;
-			//예외상황
+			//exception
 			if (sramq->link->link == NULL) global_time = dramq->link->end_time;
 		}
 		else if (sramq->link != NULL && dramq->link == NULL) {
@@ -32,7 +31,7 @@ void update_global_time(ListNode* sramq, ListNode* dramq, ListNode* nandq) {
 			global_time = dramq->link->end_time;
 		}
 	}
-	else { //nand write 중
+	else { //during nand write
 		if (dramq->link != NULL && nandq->link != NULL) {
 			global_time = nandq->link->end_time;
 		}
@@ -42,7 +41,7 @@ void update_global_time(ListNode* sramq, ListNode* dramq, ListNode* nandq) {
 void process_pcieq(ListNode* pcieq, ListNode* sramq) {
 	if (!pcieq_empty && !sram_wport_busy) {
 		if (pcieq->end_time <= global_time) {
-			//p에 pcieq저장 후 마지막 노드의 값을 sramq에 넣는 과정
+			//store pcieq into p. and then, put the last node into sramq.
 			ListNode* p = pcieq;
 			while (p->link != NULL)
 			{
@@ -64,13 +63,13 @@ void process_pcieq(ListNode* pcieq, ListNode* sramq) {
 }
 
 void process_sramq(ListNode* sramq, ListNode* dramq) {
-	//sramq가 비면 nand write를 할 수 있도록 nand_enable신호 제어.
+	//if sramq is empty, enables nand write using nand_enable.
 	if (sramq->link != NULL) nand_enable = 0;
 	else {
 		sram_empty = 1;
 		nand_enable = 1;
 	}
-	//sramq가 비어있지 않은 동안 dram write 진행
+	//dram write during sramq isn't empty
 	if (!sram_empty && !dram_busy && !nand_enable) {
 		ListNode* p = sramq;
 		while (p->link != NULL) {
