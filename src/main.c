@@ -1,10 +1,16 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "linked_list.h"
-#include "ssd_sim.h"
+#include "../header/linked_list.h"
+#include "../header/ssd_sim.h"
 
 
 int main() {
-	//file read from "files.txt"
+	//"files.txt" stores 3x4 matrix.
+	//   file name(as number)  |  R(1)/W(0)  |  file size (bytes)  |  arrival time (ns)
+	//(example)  3243                 0               4096                   0
+	//            101                 0               4096                   1
+	//           2222                 0               4096                   2
+	//(notice) you can actually ignore about arrival time. It doesn't matter in this project.
+	         
 	int files[3][4] = { {0,},};
 	FILE* fp = NULL;
 	fp = fopen("files.txt", "r");
@@ -20,12 +26,12 @@ int main() {
 	ListNode* dramq = init_head();
 	ListNode* nandq = init_head();
 
-	//pcieq에 files.txt의 내용 넣기
+	//put the information from files.txt into pcieq
 	for (i = 0; i < 3; i++) {
 		add_node(pcieq, files[i][0], files[i][1], files[i][2], files[i][3]);
 	}
 
-	//시뮬레이션 화면 상단 제목
+	//simulation display
 	printf("device \tfile name \t w/r \t size(byte) \t end time(ns)\n");
 
 	int count = 0;
@@ -48,7 +54,7 @@ int main() {
 		count++;
 	}
 
-	//heap영역의 할당 공간 해제
+	//make free the heap storage
 	free_list(pcieq);
 	free_list(sramq);
 	free_list(dramq);

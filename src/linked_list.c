@@ -1,19 +1,19 @@
-#include "linked_list.h"
+#include "../header/linked_list.h"
 
-//노드 생성
+//makes a node
 ListNode* create_node() {
 	ListNode* p = (ListNode*)malloc(sizeof(ListNode));
 	p->link = NULL;
 	return p;
 }
 
-// link가 NULL인 노드 생성 후 head 리턴
+//makes a link which is NULL and then return head
 ListNode* init_head() {
 	ListNode* head = create_node();
 	return head;
 }
 
-//노드 앞쪽에 새로운 노드 추가
+//add a new node infront of the current node. 
 void add_node(ListNode* head, int file_name, int wr, int bytes, int end_time) {
 	ListNode* new_node = create_node();
 
@@ -27,7 +27,7 @@ void add_node(ListNode* head, int file_name, int wr, int bytes, int end_time) {
 
 }
 
-//맨 뒤의 노드 삭제
+//delete the last node.
 void delete_node(ListNode* head) {
 	ListNode* p = head;
 	if (p->link != NULL) {
