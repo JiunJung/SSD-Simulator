@@ -25,7 +25,7 @@ The result of the simulation will be like this.
 [Figure2] Result of SSD Simulator.
 
 
-You can check how much it takes to store data in SSD. You can even find the sequence of the whole proccess.
+You can check how much time does it take to store data in SSD. You can even find the sequence of the whole proccess.
 
 # Garbage Collection
 
